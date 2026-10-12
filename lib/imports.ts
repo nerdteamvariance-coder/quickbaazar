@@ -7,6 +7,7 @@ import { db, save, logAction } from './store';
 import { getResource, type Resource, type Field } from './resources';
 import { imgUrl } from './data';
 import { parseCsv, toCsv } from './csv';
+import { UPLOAD_DIR } from './paths';
 import { viewRows, createItem, updateItem } from './adminCrud';
 
 const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, '');
@@ -70,7 +71,7 @@ export async function downloadImage(url: string): Promise<string> {
     const buf = Buffer.from(await res.arrayBuffer());
     if (buf.length > 5 * 1024 * 1024) throw new Error('Image is larger than 5 MB');
     const name = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}${IMG_EXT[type]}`;
-    const dir = path.join(process.cwd(), 'public', 'uploads'); fs.mkdirSync(dir, { recursive: true });
+    const dir = UPLOAD_DIR; fs.mkdirSync(dir, { recursive: true });
     fs.writeFileSync(path.join(dir, name), buf); return '/uploads/' + name;
   } catch (e: any) { throw new Error(e.name === 'AbortError' ? 'Image download timed out' : e.message); }
   finally { clearTimeout(t); }
